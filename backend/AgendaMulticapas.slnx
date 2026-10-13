@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Agenda.Api/Agenda.Api.csproj" />
+  <Project Path="Agenda.Business/Agenda.Business.csproj" />
+  <Project Path="Agenda.Data/Agenda.Data.csproj" />
+  <Project Path="Agenda.Domain/Agenda.Domain.csproj" />
+</Solution>
