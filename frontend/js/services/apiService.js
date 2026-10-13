@@ -1,29 +1,33 @@
 const API_BASE_URL = 'http://localhost:5000/api/contactos';
 
-async function manejarRespuesta(respuesta) {
+function manejarRespuesta(respuesta) {
     if (!respuesta.ok) {
-        let detalleError = 'Error en la petición.';
-        try {
-            const data = await respuesta.json();
-            if (data && data.mensaje) {
-                detalleError = data.mensaje;
-            } else if (data && data.errors) {
-                detalleError = Object.values(data.errors).flat().join(' ');
-            }
-        } catch {
-            detalleError = `Error HTTP ${respuesta.status}: ${respuesta.statusText}`;
-        }
-        throw new Error(detalleError);
+        return respuesta.json()
+            .then(data => {
+                let detalle = 'Error en la petición.';
+                if (data && data.mensaje) {
+                    detalle = data.mensaje;
+                } else if (data && data.errors) {
+                    detalle = Object.values(data.errors).flat().join(' ');
+                }
+                throw new Error(detalle);
+            })
+            .catch(error => {
+                if (error.message && error.message !== 'Error en la petición.') {
+                    throw error;
+                }
+                throw new Error(`Error HTTP ${respuesta.status}: ${respuesta.statusText}`);
+            });
     }
 
     if (respuesta.status === 204) {
-        return null;
+        return Promise.resolve(null);
     }
 
-    return await respuesta.json();
+    return respuesta.json();
 }
 
-export const apiService = {
+window.apiService = {
     obtenerTodos(busqueda = '', categoria = '') {
         const params = new URLSearchParams();
         if (busqueda) params.append('busqueda', busqueda);

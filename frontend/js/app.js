@@ -1,28 +1,31 @@
-import { apiService } from './services/apiService.js';
-import { uiManager } from './ui/uiManager.js';
-
 let contactosLocales = [];
 let idParaEliminar = null;
 let temporizadorBusqueda = null;
 
-async function cargarContactos() {
+function cargarContactos() {
     uiManager.mostrarCargando(true);
-    const busqueda = uiManager.elementos.inputBusqueda.value.trim();
-    const categoria = uiManager.elementos.selectCategoriaFiltro.value;
+    const busqueda = uiManager.elementos.inputBusqueda ? uiManager.elementos.inputBusqueda.value.trim() : '';
+    const categoria = uiManager.elementos.selectCategoriaFiltro ? uiManager.elementos.selectCategoriaFiltro.value : 'Todos';
 
-    try {
-        contactosLocales = await apiService.obtenerTodos(busqueda, categoria);
-        uiManager.renderizarContactos(contactosLocales);
-        uiManager.actualizarEstadisticas(contactosLocales);
-    } catch (error) {
-        uiManager.mostrarToast(error.message || 'Error al conectar con la API.', 'error');
-        uiManager.renderizarContactos([]);
-    } finally {
-        uiManager.mostrarCargando(false);
-    }
+    return apiService.obtenerTodos(busqueda, categoria)
+        .then(contactos => {
+            contactosLocales = contactos || [];
+            uiManager.renderizarContactos(contactosLocales);
+            uiManager.actualizarEstadisticas(contactosLocales);
+        })
+        .catch(error => {
+            uiManager.mostrarToast(
+                error.message || 'No se pudo conectar con la API en http://localhost:5000.',
+                'error'
+            );
+            uiManager.renderizarContactos([]);
+        })
+        .finally(() => {
+            uiManager.mostrarCargando(false);
+        });
 }
 
-async function manejarGuardarContacto(evento) {
+function manejarGuardarContacto(evento) {
     evento.preventDefault();
     const datos = uiManager.obtenerDatosFormulario();
 
@@ -202,6 +205,7 @@ function registrarEventos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    uiManager.inicializar();
     registrarEventos();
     cargarContactos();
 });

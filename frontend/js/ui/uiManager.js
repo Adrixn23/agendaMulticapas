@@ -8,42 +8,47 @@ function escaparHtml(cadena) {
         .replace(/'/g, '&#039;');
 }
 
-export const uiManager = {
-    elementos: {
-        listaContactos: document.getElementById('listaContactos'),
-        loader: document.getElementById('loader'),
-        emptyState: document.getElementById('emptyState'),
-        modalContacto: document.getElementById('modalContacto'),
-        formContacto: document.getElementById('formContacto'),
-        modalTitulo: document.getElementById('modalTitulo'),
-        contactoId: document.getElementById('contactoId'),
-        inputNombre: document.getElementById('inputNombre'),
-        inputApellido: document.getElementById('inputApellido'),
-        inputTelefono: document.getElementById('inputTelefono'),
-        inputEmail: document.getElementById('inputEmail'),
-        inputDireccion: document.getElementById('inputDireccion'),
-        selectCategoria: document.getElementById('selectCategoria'),
-        checkFavorito: document.getElementById('checkFavorito'),
-        btnNuevoContacto: document.getElementById('btnNuevoContacto'),
-        btnCerrarModal: document.getElementById('btnCerrarModal'),
-        btnCancelarModal: document.getElementById('btnCancelarModal'),
-        inputBusqueda: document.getElementById('inputBusqueda'),
-        btnLimpiarBusqueda: document.getElementById('btnLimpiarBusqueda'),
-        selectCategoriaFiltro: document.getElementById('selectCategoriaFiltro'),
-        modalConfirmar: document.getElementById('modalConfirmar'),
-        confirmarMensaje: document.getElementById('confirmarMensaje'),
-        btnAceptarEliminar: document.getElementById('btnAceptarEliminar'),
-        btnCancelarEliminar: document.getElementById('btnCancelarEliminar'),
-        btnCerrarConfirmar: document.getElementById('btnCerrarConfirmar'),
-        toastContainer: document.getElementById('toastContainer'),
-        statTotal: document.getElementById('statTotal'),
-        statFavoritos: document.getElementById('statFavoritos'),
-        statTrabajo: document.getElementById('statTrabajo'),
-        statFamilia: document.getElementById('statFamilia'),
-        statAmigos: document.getElementById('statAmigos')
+window.uiManager = {
+    elementos: {},
+
+    inicializar() {
+        this.elementos = {
+            listaContactos: document.getElementById('listaContactos'),
+            loader: document.getElementById('loader'),
+            emptyState: document.getElementById('emptyState'),
+            modalContacto: document.getElementById('modalContacto'),
+            formContacto: document.getElementById('formContacto'),
+            modalTitulo: document.getElementById('modalTitulo'),
+            contactoId: document.getElementById('contactoId'),
+            inputNombre: document.getElementById('inputNombre'),
+            inputApellido: document.getElementById('inputApellido'),
+            inputTelefono: document.getElementById('inputTelefono'),
+            inputEmail: document.getElementById('inputEmail'),
+            inputDireccion: document.getElementById('inputDireccion'),
+            selectCategoria: document.getElementById('selectCategoria'),
+            checkFavorito: document.getElementById('checkFavorito'),
+            btnNuevoContacto: document.getElementById('btnNuevoContacto'),
+            btnCerrarModal: document.getElementById('btnCerrarModal'),
+            btnCancelarModal: document.getElementById('btnCancelarModal'),
+            inputBusqueda: document.getElementById('inputBusqueda'),
+            btnLimpiarBusqueda: document.getElementById('btnLimpiarBusqueda'),
+            selectCategoriaFiltro: document.getElementById('selectCategoriaFiltro'),
+            modalConfirmar: document.getElementById('modalConfirmar'),
+            confirmarMensaje: document.getElementById('confirmarMensaje'),
+            btnAceptarEliminar: document.getElementById('btnAceptarEliminar'),
+            btnCancelarEliminar: document.getElementById('btnCancelarEliminar'),
+            btnCerrarConfirmar: document.getElementById('btnCerrarConfirmar'),
+            toastContainer: document.getElementById('toastContainer'),
+            statTotal: document.getElementById('statTotal'),
+            statFavoritos: document.getElementById('statFavoritos'),
+            statTrabajo: document.getElementById('statTrabajo'),
+            statFamilia: document.getElementById('statFamilia'),
+            statAmigos: document.getElementById('statAmigos')
+        };
     },
 
     mostrarCargando(mostrar = true) {
+        if (!this.elementos.loader) return;
         if (mostrar) {
             this.elementos.loader.classList.remove('hidden');
             this.elementos.listaContactos.classList.add('hidden');
@@ -55,6 +60,7 @@ export const uiManager = {
     },
 
     renderizarContactos(contactos) {
+        if (!this.elementos.listaContactos) return;
         this.elementos.listaContactos.innerHTML = '';
 
         if (!contactos || contactos.length === 0) {
@@ -132,11 +138,11 @@ export const uiManager = {
         const familia = contactos.filter(c => c.categoria && c.categoria.toLowerCase() === 'familia').length;
         const amigos = contactos.filter(c => c.categoria && c.categoria.toLowerCase() === 'amigos').length;
 
-        this.elementos.statTotal.textContent = total;
-        this.elementos.statFavoritos.textContent = favoritos;
-        this.elementos.statTrabajo.textContent = trabajo;
-        this.elementos.statFamilia.textContent = familia;
-        this.elementos.statAmigos.textContent = amigos;
+        if (this.elementos.statTotal) this.elementos.statTotal.textContent = total;
+        if (this.elementos.statFavoritos) this.elementos.statFavoritos.textContent = favoritos;
+        if (this.elementos.statTrabajo) this.elementos.statTrabajo.textContent = trabajo;
+        if (this.elementos.statFamilia) this.elementos.statFamilia.textContent = familia;
+        if (this.elementos.statAmigos) this.elementos.statAmigos.textContent = amigos;
     },
 
     abrirModal(modo = 'crear', datos = null) {
