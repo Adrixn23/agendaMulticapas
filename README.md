@@ -1,38 +1,59 @@
-# Agenda Multicapas
+# Multiagenda Tarea 3
 
-Aplicación web para gestión de contactos desarrollada con arquitectura multicapas en C# (.NET) y frontend en JavaScript vanilla con Promesas.
+**Estudiante:** Adrian Francisco Brito Nelkitts  
+**Matrícula:** 2025-1150  
+**Materia:** Programación Web  
+**Repositorio:** [https://github.com/Adrixn23/agendaMulticapas](https://github.com/Adrixn23/agendaMulticapas)
 
-## Estructura del Proyecto
+---
 
-* **`Agenda.Domain`**: Entidades (`Contacto`), DTOs con validaciones e interfaces (`IContactoRepository`, `IContactoService`).
-* **`Agenda.Data`**: Persistencia en JSON asíncrono con control de concurrencia (`SemaphoreSlim`).
-* **`Agenda.Business`**: Reglas de negocio (unicidad de teléfono/correo, filtros y normalización).
-* **`Agenda.Api`**: Controladores REST (`ContactosController`), inyección de dependencias y configuración de CORS.
-* **`frontend`**: Interfaz de usuario minimalista (`HTML/CSS/JS`) consumiendo la API mediante `fetch` y Promesas.
+## Capturas de Pantalla
 
-## Ejecución
+### Vista Principal de Contactos
+![Vista Principal](docs/screenshots/captura_2026-10-13_130849.png)
 
-### 1. Backend (.NET Web API)
+### Modal de Registro y Edición
+![Modal Nuevo Contacto](docs/screenshots/captura_2026-10-13_130904.png)
+
+---
+
+## Arquitectura Multicapa
+
+* **`Agenda.Domain`**: Entidades (`Contacto`), DTOs con validaciones de atributos e interfaces (`IContactoRepository`, `IContactoService`).
+* **`Agenda.Data`**: Repositorio de acceso a datos con persistencia JSON asíncrona y control de concurrencia (`SemaphoreSlim`).
+* **`Agenda.Business`**: Lógica de negocio (reglas de no duplicidad de correo/teléfono, filtros y normalización).
+* **`Agenda.Api`**: Controladores RESTful (`ContactosController`), inyección de dependencias y configuración de CORS.
+* **`frontend`**: Interfaz web moderna y minimalista que consume la API mediante `fetch` y Promesas de JavaScript.
+
+---
+
+## Instrucciones de Ejecución
+
+### 1. Iniciar la API Backend
 ```bash
 cd backend/Agenda.Api
 dotnet run
 ```
-La API escucha en `http://localhost:5000`.
+La API queda escuchando en `http://localhost:5000`.
 
-### 2. Frontend
-Abre directamente `frontend/index.html` en el navegador o accede a `http://localhost:5000/index.html`.
+### 2. Abrir la Aplicación Web
+Accede desde tu navegador a `http://localhost:5000` o abre directamente el archivo `frontend/index.html`.
+
+---
 
 ## Endpoints de la API (`/api/contactos`)
 
-* `GET /api/contactos`: Lista de contactos (soporta `busqueda` y `categoria`).
-* `GET /api/contactos/{id}`: Detalle de un contacto.
-* `POST /api/contactos`: Registro de nuevo contacto.
-* `PUT /api/contactos/{id}`: Actualización de datos.
-* `DELETE /api/contactos/{id}`: Eliminación de contacto.
-* `PATCH /api/contactos/{id}/favorito`: Alternar favorito.
+* `GET /api/contactos` - Obtener lista de contactos (soporta filtros `busqueda` y `categoria`).
+* `GET /api/contactos/{id}` - Obtener contacto por Id.
+* `POST /api/contactos` - Crear nuevo contacto.
+* `PUT /api/contactos/{id}` - Actualizar contacto.
+* `DELETE /api/contactos/{id}` - Eliminar contacto.
+* `PATCH /api/contactos/{id}/favorito` - Alternar estado de favorito.
 
-## Principios Aplicados
+---
 
-* **SOLID**: Responsabilidad única por capa, inversión de dependencias con interfaces, persistencia desacoplada.
-* **CORS**: Habilitado para permitir peticiones cruzadas desde el frontend.
-* **Asincronía**: Uso de `Task` / `async` / `await` en C# y Promesas nativas en JavaScript.
+## Buenas Prácticas Aplicadas
+
+* **Principios SOLID**: Responsabilidad única por capa, inversión de dependencias con interfaces y desacoplamiento de la persistencia.
+* **CORS**: Habilitado para permitir peticiones entre el cliente web y el backend.
+* **Promesas en JavaScript**: Manejo asíncrono con `Promise`, `fetch`, `.then()` y `.catch()`.
