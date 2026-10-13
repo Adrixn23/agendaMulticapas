@@ -1,17 +1,17 @@
 let contactosLocales = [];
 let idParaEliminar = null;
 let temporizadorBusqueda = null;
+let categoriaActual = 'Todos';
 
 function cargarContactos() {
     uiManager.mostrarCargando(true);
     const busqueda = uiManager.elementos.inputBusqueda ? uiManager.elementos.inputBusqueda.value.trim() : '';
-    const categoria = uiManager.elementos.selectCategoriaFiltro ? uiManager.elementos.selectCategoriaFiltro.value : 'Todos';
 
-    return apiService.obtenerTodos(busqueda, categoria)
+    return apiService.obtenerTodos(busqueda, categoriaActual)
         .then(contactos => {
             contactosLocales = contactos || [];
             uiManager.renderizarContactos(contactosLocales);
-            uiManager.actualizarEstadisticas(contactosLocales);
+            uiManager.actualizarResumen(contactosLocales);
         })
         .catch(error => {
             uiManager.mostrarToast(
@@ -19,6 +19,7 @@ function cargarContactos() {
                 'error'
             );
             uiManager.renderizarContactos([]);
+            uiManager.actualizarResumen([]);
         })
         .finally(() => {
             uiManager.mostrarCargando(false);
@@ -57,7 +58,7 @@ function manejarGuardarContacto(evento) {
         .then(() => {
             uiManager.cerrarModal();
             uiManager.mostrarToast(
-                esEdicion ? 'Contacto actualizado correctamente.' : 'Contacto creado correctamente.',
+                esEdicion ? 'Contacto actualizado.' : 'Contacto guardado.',
                 'success'
             );
             return cargarContactos();
@@ -113,7 +114,7 @@ function confirmarEliminar() {
     apiService.eliminar(idParaEliminar)
         .then(() => {
             uiManager.cerrarModalConfirmar();
-            uiManager.mostrarToast('Contacto eliminado correctamente.', 'success');
+            uiManager.mostrarToast('Contacto eliminado.', 'success');
             idParaEliminar = null;
             return cargarContactos();
         })
@@ -133,12 +134,21 @@ function manejarInputBusqueda() {
     clearTimeout(temporizadorBusqueda);
     temporizadorBusqueda = setTimeout(() => {
         cargarContactos();
-    }, 300);
+    }, 250);
 }
 
 function limpiarBusqueda() {
     uiManager.elementos.inputBusqueda.value = '';
     uiManager.elementos.btnLimpiarBusqueda.classList.remove('active');
+    cargarContactos();
+}
+
+function manejarCambioCategoria(evento) {
+    const boton = evento.target.closest('.tab-pill');
+    if (!boton) return;
+
+    categoriaActual = boton.dataset.category;
+    uiManager.activarPestañaCategoria(categoriaActual);
     cargarContactos();
 }
 
@@ -187,9 +197,9 @@ function registrarEventos() {
     uiManager.elementos.inputBusqueda.addEventListener('input', manejarInputBusqueda);
     uiManager.elementos.btnLimpiarBusqueda.addEventListener('click', limpiarBusqueda);
 
-    uiManager.elementos.selectCategoriaFiltro.addEventListener('change', () => {
-        cargarContactos();
-    });
+    if (uiManager.elementos.categoryTabs) {
+        uiManager.elementos.categoryTabs.addEventListener('click', manejarCambioCategoria);
+    }
 
     document.addEventListener('keydown', evento => {
         if (evento.key === 'Escape') {

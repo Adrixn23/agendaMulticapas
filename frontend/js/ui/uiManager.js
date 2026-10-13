@@ -8,6 +8,12 @@ function escaparHtml(cadena) {
         .replace(/'/g, '&#039;');
 }
 
+function obtenerIniciales(nombre, apellido) {
+    const n = (nombre || '').trim().charAt(0).toUpperCase();
+    const a = (apellido || '').trim().charAt(0).toUpperCase();
+    return `${n}${a}` || '—';
+}
+
 window.uiManager = {
     elementos: {},
 
@@ -32,18 +38,14 @@ window.uiManager = {
             btnCancelarModal: document.getElementById('btnCancelarModal'),
             inputBusqueda: document.getElementById('inputBusqueda'),
             btnLimpiarBusqueda: document.getElementById('btnLimpiarBusqueda'),
-            selectCategoriaFiltro: document.getElementById('selectCategoriaFiltro'),
+            categoryTabs: document.getElementById('categoryTabs'),
             modalConfirmar: document.getElementById('modalConfirmar'),
             confirmarMensaje: document.getElementById('confirmarMensaje'),
             btnAceptarEliminar: document.getElementById('btnAceptarEliminar'),
             btnCancelarEliminar: document.getElementById('btnCancelarEliminar'),
             btnCerrarConfirmar: document.getElementById('btnCerrarConfirmar'),
             toastContainer: document.getElementById('toastContainer'),
-            statTotal: document.getElementById('statTotal'),
-            statFavoritos: document.getElementById('statFavoritos'),
-            statTrabajo: document.getElementById('statTrabajo'),
-            statFamilia: document.getElementById('statFamilia'),
-            statAmigos: document.getElementById('statAmigos')
+            txtResumen: document.getElementById('txtResumen')
         };
     },
 
@@ -74,51 +76,54 @@ window.uiManager = {
 
         contactos.forEach(contacto => {
             const card = document.createElement('article');
-            card.className = `contact-card ${contacto.favorito ? 'is-favorite' : ''}`;
+            card.className = 'contacto-card';
             card.dataset.id = contacto.id;
 
-            const categoriaClase = contacto.categoria ? contacto.categoria.toLowerCase() : 'general';
+            const iniciales = obtenerIniciales(contacto.nombre, contacto.apellido);
 
             card.innerHTML = `
-                <div class="card-header">
-                    <div class="contact-name-group">
-                        <h3 class="contact-name">${escaparHtml(contacto.nombre)} ${escaparHtml(contacto.apellido)}</h3>
-                        <span class="category-tag ${categoriaClase}">${escaparHtml(contacto.categoria || 'General')}</span>
+                <div class="card-top">
+                    <div class="user-meta">
+                        <div class="avatar">${iniciales}</div>
+                        <div class="user-names">
+                            <h3 class="user-name">${escaparHtml(contacto.nombre)} ${escaparHtml(contacto.apellido)}</h3>
+                            <span class="badge-tag">${escaparHtml(contacto.categoria || 'General')}</span>
+                        </div>
                     </div>
                     <button type="button" class="btn-star ${contacto.favorito ? 'active' : ''}" 
                             data-action="toggle-fav" data-id="${contacto.id}" 
-                            title="${contacto.favorito ? 'Quitar de favoritos' : 'Marcar como favorito'}">
+                            title="${contacto.favorito ? 'Favorito' : 'Marcar favorito'}">
                         ★
                     </button>
                 </div>
-                <div class="card-body">
-                    <div class="contact-info-row">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="card-details">
+                    <div class="detail-row">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                         </svg>
                         <span>${escaparHtml(contacto.telefono)}</span>
                     </div>
-                    <div class="contact-info-row">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="detail-row">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
                         <span>${escaparHtml(contacto.email)}</span>
                     </div>
                     ${contacto.direccion ? `
-                    <div class="contact-info-row">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="detail-row">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                         </svg>
                         <span>${escaparHtml(contacto.direccion)}</span>
                     </div>` : ''}
                 </div>
-                <div class="card-actions">
-                    <button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${contacto.id}">
+                <div class="card-foot">
+                    <button type="button" class="btn btn-light btn-xs" data-action="edit" data-id="${contacto.id}">
                         Editar
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${contacto.id}">
+                    <button type="button" class="btn btn-light btn-xs" data-action="delete" data-id="${contacto.id}">
                         Eliminar
                     </button>
                 </div>
@@ -130,19 +135,24 @@ window.uiManager = {
         this.elementos.listaContactos.appendChild(fragment);
     },
 
-    actualizarEstadisticas(contactos) {
-        if (!contactos) return;
+    actualizarResumen(contactos) {
+        if (!this.elementos.txtResumen) return;
+        if (!contactos || contactos.length === 0) {
+            this.elementos.txtResumen.textContent = '0 contactos registrados';
+            return;
+        }
+
         const total = contactos.length;
         const favoritos = contactos.filter(c => c.favorito).length;
-        const trabajo = contactos.filter(c => c.categoria && c.categoria.toLowerCase() === 'trabajo').length;
-        const familia = contactos.filter(c => c.categoria && c.categoria.toLowerCase() === 'familia').length;
-        const amigos = contactos.filter(c => c.categoria && c.categoria.toLowerCase() === 'amigos').length;
+        this.elementos.txtResumen.textContent = `${total} contacto${total > 1 ? 's' : ''} ${favoritos > 0 ? `· ${favoritos} en favoritos` : ''}`;
+    },
 
-        if (this.elementos.statTotal) this.elementos.statTotal.textContent = total;
-        if (this.elementos.statFavoritos) this.elementos.statFavoritos.textContent = favoritos;
-        if (this.elementos.statTrabajo) this.elementos.statTrabajo.textContent = trabajo;
-        if (this.elementos.statFamilia) this.elementos.statFamilia.textContent = familia;
-        if (this.elementos.statAmigos) this.elementos.statAmigos.textContent = amigos;
+    activarPestañaCategoria(categoriaSeleccionada) {
+        if (!this.elementos.categoryTabs) return;
+        const botones = this.elementos.categoryTabs.querySelectorAll('.tab-pill');
+        botones.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === categoriaSeleccionada);
+        });
     },
 
     abrirModal(modo = 'crear', datos = null) {
@@ -150,7 +160,7 @@ window.uiManager = {
         this.elementos.formContacto.reset();
 
         if (modo === 'editar' && datos) {
-            this.elementos.modalTitulo.textContent = 'Editar Contacto';
+            this.elementos.modalTitulo.textContent = 'Editar contacto';
             this.elementos.contactoId.value = datos.id;
             this.elementos.inputNombre.value = datos.nombre;
             this.elementos.inputApellido.value = datos.apellido;
@@ -160,7 +170,7 @@ window.uiManager = {
             this.elementos.selectCategoria.value = datos.categoria || 'General';
             this.elementos.checkFavorito.checked = Boolean(datos.favorito);
         } else {
-            this.elementos.modalTitulo.textContent = 'Nuevo Contacto';
+            this.elementos.modalTitulo.textContent = 'Nuevo contacto';
             this.elementos.contactoId.value = '';
             this.elementos.selectCategoria.value = 'General';
             this.elementos.checkFavorito.checked = false;
@@ -177,7 +187,7 @@ window.uiManager = {
     },
 
     abrirModalConfirmar(nombreContacto) {
-        this.elementos.confirmarMensaje.textContent = `¿Estás seguro de que deseas eliminar el contacto "${nombreContacto}"? Esta acción no se puede deshacer.`;
+        this.elementos.confirmarMensaje.textContent = `¿Eliminar a "${nombreContacto}"?`;
         this.elementos.modalConfirmar.classList.remove('hidden');
     },
 
@@ -203,27 +213,27 @@ window.uiManager = {
         let esValido = true;
 
         if (!datos.nombre || datos.nombre.length < 2) {
-            this.mostrarErrorCampo('errorNombre', 'El nombre debe tener al menos 2 caracteres.');
+            this.mostrarErrorCampo('errorNombre', 'Mínimo 2 caracteres');
             this.elementos.inputNombre.classList.add('invalid');
             esValido = false;
         }
 
         if (!datos.apellido || datos.apellido.length < 2) {
-            this.mostrarErrorCampo('errorApellido', 'El apellido debe tener al menos 2 caracteres.');
+            this.mostrarErrorCampo('errorApellido', 'Mínimo 2 caracteres');
             this.elementos.inputApellido.classList.add('invalid');
             esValido = false;
         }
 
         const regexTelefono = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{6,15}$/;
         if (!datos.telefono || !regexTelefono.test(datos.telefono)) {
-            this.mostrarErrorCampo('errorTelefono', 'Ingrese un formato de teléfono válido.');
+            this.mostrarErrorCampo('errorTelefono', 'Formato no válido');
             this.elementos.inputTelefono.classList.add('invalid');
             esValido = false;
         }
 
         const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!datos.email || !regexEmail.test(datos.email)) {
-            this.mostrarErrorCampo('errorEmail', 'Ingrese un correo electrónico válido.');
+            this.mostrarErrorCampo('errorEmail', 'Correo no válido');
             this.elementos.inputEmail.classList.add('invalid');
             esValido = false;
         }
@@ -255,18 +265,17 @@ window.uiManager = {
         });
     },
 
-    mostrarToast(mensaje, tipo = 'success') {
+    mostrarToast(mensaje, tipo = 'normal') {
         const toast = document.createElement('div');
-        toast.className = `toast toast-${tipo}`;
+        toast.className = `toast ${tipo === 'error' ? 'toast-error' : tipo === 'success' ? 'toast-success' : ''}`;
         toast.textContent = mensaje;
 
         this.elementos.toastContainer.appendChild(toast);
 
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateY(10px)';
-            toast.style.transition = 'opacity 0.2s, transform 0.2s';
-            setTimeout(() => toast.remove(), 200);
-        }, 3200);
+            toast.style.transition = 'opacity 0.15s';
+            setTimeout(() => toast.remove(), 150);
+        }, 2800);
     }
 };
